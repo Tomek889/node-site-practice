@@ -1,4 +1,19 @@
 const http = require("http");
+const fs = require("fs");
+const path = require("path");
+
+const servePage = (res, fileName) => {
+  const filePath = path.join(__dirname, fileName);
+  fs.readFile(filePath, (err, content) => {
+    if (err) {
+      res.writeHead(500, { "Content-Type": "text/plain" });
+      res.end("Server Error");
+    } else {
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.end(content);
+    }
+  });
+};
 
 http
   .createServer((req, res) => {
@@ -7,17 +22,13 @@ http
     const pathname = parsedUrl.pathname;
 
     if (method === "GET" && pathname === "/") {
-      res.writeHead(200, { "Content-Type": "text/plain" });
-      res.end("home");
+      servePage(res, "index.html");
     } else if (method === "GET" && pathname === "/about") {
-      res.writeHead(200, { "Content-Type": "text/plain" });
-      res.end("about");
+      servePage(res, "about.html");
     } else if (method === "GET" && pathname === "/contact-me") {
-      res.writeHead(200, { "Content-Type": "text/plain" });
-      res.end("contact-me");
+      servePage(res, "contact-me.html");
     } else {
-      res.writeHead(404);
-      res.end("Not Found");
+      servePage(res, "404.html");
     }
   })
   .listen(8080);
