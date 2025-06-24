@@ -23,5 +23,5 @@ app.use((req, res) => servePage("./404.html", res));
 
 const PORT = 8080;
 app.listen(PORT, () => {
-  console.log(`Express app = listening on port ${PORT}`);
+  console.log(`Express app - listening on port ${PORT}`);
 });
