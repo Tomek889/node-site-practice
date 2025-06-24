@@ -1,34 +1,27 @@
-const http = require("http");
-const fs = require("fs");
+const express = require("express");
+const app = express();
 const path = require("path");
 
-const servePage = (res, fileName) => {
-  const filePath = path.join(__dirname, fileName);
-  fs.readFile(filePath, (err, content) => {
+const servePage = (fileName, res) => {
+  const fullPath = path.resolve(__dirname, fileName);
+  res.sendFile(fullPath, (err) => {
     if (err) {
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end("Server Error");
+      res.status(500).send("Server error.");
     } else {
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.end(content);
+      console.log("Sent:", fileName);
     }
   });
 };
 
-http
-  .createServer((req, res) => {
-    const { method, url } = req;
-    const parsedUrl = new URL(url, `http://${req.headers.host}`);
-    const pathname = parsedUrl.pathname;
+app.get("/", (req, res) => servePage("./index.html", res));
 
-    if (method === "GET" && pathname === "/") {
-      servePage(res, "index.html");
-    } else if (method === "GET" && pathname === "/about") {
-      servePage(res, "about.html");
-    } else if (method === "GET" && pathname === "/contact-me") {
-      servePage(res, "contact-me.html");
-    } else {
-      servePage(res, "404.html");
-    }
-  })
-  .listen(8080);
+app.get("/about", (req, res) => servePage("./about.html", res));
+
+app.get("/contact-me", (req, res) => servePage("./contact-me.html", res));
+
+app.use((req, res) => servePage("./404.html", res));
+
+const PORT = 8080;
+app.listen(PORT, () => {
+  console.log(`Express app = listening on port ${PORT}`);
+});
